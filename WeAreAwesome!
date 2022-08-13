@@ -3,7 +3,6 @@
 
 #define xJoystick A0
 #define yJoystick A1
-#define s 4
 
 //DeadArea value
 #define joystickDeadValue 520
@@ -13,6 +12,14 @@ int motor1PinR = 5;
 int motor1PinL = 6;
 int motor2PinR = 9;
 int motor2PinL = 10;
+
+int led1Red = 3;
+int led1Green = 2; 
+int led1Blue = 4;
+
+int led2Red = 8;
+int led2Green = 7;
+int led2Blue = 21;
 
 
 //ezButton butonn(s);
@@ -25,8 +32,16 @@ void setup() {
   pinMode(motor1PinL, OUTPUT);
   pinMode(motor2PinR, OUTPUT);
   pinMode(motor2PinL, OUTPUT);
-  pinMode(s, INPUT);
+ 
+  pinMode(led1Red, OUTPUT);
+  pinMode(led1Green, OUTPUT);
+  pinMode(led1Blue, OUTPUT);
 
+  pinMode(led2Red, OUTPUT);
+  pinMode(led2Green, OUTPUT);
+  pinMode(led2Blue, OUTPUT);
+
+  
   //possible button
   //butonn.setDebounceTime(100);
 
@@ -40,6 +55,14 @@ void loop() {
   //Makes sure x and y don't get off the dead area by small changes.
   y = deadArea(y);
   x = deadArea(x);
+
+  digitalWrite(led1Red, HIGH);
+  digitalWrite(led1Green, HIGH);
+  digitalWrite(led1Blue, HIGH);
+  
+  digitalWrite(led2Red, HIGH);
+  digitalWrite(led2Green, HIGH);
+  digitalWrite(led2Blue, HIGH);
 
   //Old button code.
  /* if (butonn.isPressed()) {
@@ -100,13 +123,16 @@ int movement(float xValue, float yValue) {
    Serial.print(xValue);
    Serial.print(", yValue = ");
    Serial.println(yValue);
+   
   if ((xValue > joystickDeadValue && yValue == joystickDeadValue)) { //forwards x
     analogWrite(motor1PinR, /*(xValue - joystickDeadValue) / 2*/ xSpeed);
     analogWrite(motor1PinL, 0);
     analogWrite(motor2PinR, /*(xValue - joystickDeadValue) / 2*/ xSpeed);
     analogWrite(motor2PinL, 0);
     //Serial.println(xValue);
-    Serial.println(/*(xValue - joystickDeadValue) / 2*/ xSpeed);    
+    Serial.println(/*(xValue - joystickDeadValue) / 2*/ xSpeed); 
+    digitalWrite(led1Green, HIGH);
+    digitalWrite(led2Blue, HIGH);
   } else if (xValue < joystickDeadValue && yValue == joystickDeadValue) { //backwards x
     analogWrite(motor1PinR, 0);
     analogWrite(motor1PinL, /*backValue*/(xSpeed));
@@ -114,6 +140,8 @@ int movement(float xValue, float yValue) {
     analogWrite(motor2PinL, xSpeed);
     //Serial.println(backValue);
     Serial.println(-1 * xSpeed);
+    digitalWrite(led1Red, HIGH);
+    digitalWrite(led2Green, HIGH);
   } else if (xValue == joystickDeadValue && yValue < joystickDeadValue) { //rotate left x
     analogWrite(motor1PinR, /*leftValue*/ (ySpeed));
     analogWrite(motor1PinL, 0);
@@ -121,6 +149,8 @@ int movement(float xValue, float yValue) {
     analogWrite(motor2PinL, /*leftValue*/ (ySpeed));
     //Serial.println(leftValue);
     Serial.println(-1 * ySpeed);
+    digitalWrite(led1Blue, HIGH);
+    digitalWrite(led2Green, HIGH);
   } else if (xValue == joystickDeadValue && yValue > joystickDeadValue) { //rotate right x
     analogWrite(motor1PinR, 0);
     analogWrite(motor1PinL, /*rightValue*/ ySpeed);
@@ -128,6 +158,8 @@ int movement(float xValue, float yValue) {
     analogWrite(motor2PinL, 0);
     //Serial.println(rightValue);
     Serial.println(ySpeed);
+    digitalWrite(led1Red, HIGH);
+    digitalWrite(led2Blue, HIGH);
   } else if (xValue < joystickDeadValue && yValue > joystickDeadValue) { //inferior right diagonal x
     if (yValue >= 520 && yValue < 771) {
       ySpeed = abs(cos((yValue - 520)/251) * 245);
@@ -141,8 +173,8 @@ int movement(float xValue, float yValue) {
     }
     analogWrite(motor1PinL, ySpeed);    
     analogWrite(motor1PinR, 0);
-    analogWrite(motor2PinR, 0);
-    analogWrite(motor2PinL, xSpeed);
+    analogWrite(motor2PinR, xSpeed);
+    analogWrite(motor2PinL, 0);
     Serial.print("Actual Y speed: ");
     Serial.println(ySpeed);
     Serial.print("Actual X speed: ");
@@ -159,8 +191,8 @@ int movement(float xValue, float yValue) {
     } else if (xValue >= 771 && xValue <= 1023) {
       xSpeed = abs(sin((xValue - 628)/251) * 245);
     }
-    analogWrite(motor1PinR, 0);
-    analogWrite(motor1PinL, xSpeed);
+    analogWrite(motor1PinR, xSpeed);
+    analogWrite(motor1PinL, 0);
     analogWrite(motor2PinR, 0);
     analogWrite(motor2PinL, ySpeed * 0.8);
     Serial.print("Actual Y speed: ");
@@ -179,8 +211,8 @@ int movement(float xValue, float yValue) {
     } else if (xValue >= 771 && xValue <= 1023) {
       xSpeed = abs(sin((xValue - 628)/251) * 245);
     }
-    analogWrite(motor1PinR, xSpeed);
-    analogWrite(motor1PinL, 0);
+    analogWrite(motor1PinR, 0);
+    analogWrite(motor1PinL, xSpeed);
     analogWrite(motor2PinR, ySpeed * 0.87);
     //analogWrite(motor2PinR, ySpeed * 0.8);
     analogWrite(motor2PinL, 0);
@@ -192,19 +224,19 @@ int movement(float xValue, float yValue) {
   } else if (xValue > joystickDeadValue && yValue > joystickDeadValue){ //superior right diagonal x
     //analogWrite(motor1PinR, ySpeed * 0.8);
     if (xValue >= 520 && xValue < 771) {
-      xSpeed = abs(cos((xValue - 520)/251) * 245);
+      xSpeed = abs(cos((xValue - 520)/251) * 246);
     } else if (xValue >= 771 && xValue <= 1023) {
-      xSpeed = abs(sin((xValue - 628)/251) * 245);
+      xSpeed = abs(sin((xValue - 628)/251) * 246);
     }
     if (yValue >= 520 && yValue < 771) {
-      ySpeed = abs(cos((yValue - 520)/251) * 245);
+      ySpeed = abs(cos((yValue - 520)/251) * 247);
     } else if (yValue >= 771 && yValue <= 1023) {
-      ySpeed = abs(sin((yValue - 628)/251) * 245);
+      ySpeed = abs(sin((yValue - 628)/251) * 247);
     }
-    analogWrite(motor1PinR, ySpeed * 0.69);
+    analogWrite(motor1PinR, ySpeed * 0.7);
     analogWrite(motor1PinL, 0);
-    analogWrite(motor2PinR, xSpeed);
-    analogWrite(motor2PinL, 0);
+    analogWrite(motor2PinR, 0);
+    analogWrite(motor2PinL, xSpeed);
     Serial.print("Actual Y speed: ");
     Serial.println(ySpeed);
     Serial.print("Actual X speed: ");
